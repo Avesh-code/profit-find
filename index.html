@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One Trade Calculator</title>
+<title>Hedge Calculator - Liquidity Focus</title>
 <style>
 :root{
   --bg:#080d17;--card:#111a2b;--card2:#0a1220;--line:#1f2d44;
@@ -17,7 +17,6 @@ color:var(--txt);padding:24px 16px;min-height:100vh}
 h1{font-size:1.3rem;margin:0 0 4px;letter-spacing:-.01em}
 .sub{color:var(--mut);font-size:.8rem;margin-bottom:22px;line-height:1.5}
 
-/* ---------- inputs ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
 padding:20px;margin-bottom:16px}
 .card h2{font-size:.72rem;margin:0 0 14px;color:var(--mut);
@@ -38,38 +37,11 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.grid2{grid-template-columns:1fr}}
 
-/* ---------- result ---------- */
-.result{background:linear-gradient(160deg,#132038 0%,#0d1626 100%);
-border:1px solid #2a3d5c;border-radius:16px;padding:22px;margin-bottom:16px;
-position:relative;overflow:hidden}
-.result::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:.6}
+.btn{background:var(--mut);color:#000;border:none;padding:8px 12px;
+border-radius:6px;font-weight:700;cursor:pointer;font-size:.7rem;
+margin-top:6px;width:100%}
+.btn:hover{background:#fff}
 
-.result h2{font-size:.7rem;margin:0 0 16px;color:var(--acc);
-text-transform:uppercase;letter-spacing:.1em;font-weight:700}
-
-.place{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.slip{background:var(--card2);border-radius:12px;padding:16px;text-align:center;
-border:1px solid var(--line)}
-.slip .side{font-size:.63rem;color:var(--mut);text-transform:uppercase;
-letter-spacing:.08em;margin-bottom:7px;font-weight:600}
-.slip .amt{font-size:1.65rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;
-line-height:1.1}
-.slip .at{font-size:.72rem;color:var(--mut);margin-top:6px;font-weight:500}
-.slip.a{border-color:rgba(56,189,248,.3)}
-.slip.b{border-color:rgba(168,85,247,.3)}
-
-.profitBox{text-align:center;padding:20px;border-radius:12px;
-background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.28)}
-.profitBox.neg{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.28)}
-.profitBox .lbl{font-size:.66rem;color:var(--mut);text-transform:uppercase;
-letter-spacing:.09em;font-weight:700;margin-bottom:8px}
-.profitBox .val{font-size:2.5rem;font-weight:900;letter-spacing:-.03em;
-color:var(--good);line-height:1}
-.profitBox.neg .val{color:var(--bad)}
-.profitBox .roi{font-size:.78rem;color:var(--mut);margin-top:9px;font-weight:500}
-
-/* ---------- scenarios ---------- */
 .scen{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 @media(max-width:520px){.scen{grid-template-columns:1fr}}
 .sc{background:var(--card2);border-radius:10px;padding:13px 15px;font-size:.79rem;
@@ -82,31 +54,25 @@ letter-spacing:.07em;font-weight:700;margin-bottom:9px}
 .sc .line b{color:var(--txt);font-weight:600}
 .sc .total{display:flex;justify-content:space-between;padding-top:8px;margin-top:6px;
 border-top:1px solid var(--line);font-weight:800;color:var(--txt)}
-
-.note{font-size:.72rem;color:var(--mut);line-height:1.6;margin-top:14px;text-align:center}
-.warnbox{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);
-border-radius:10px;padding:12px 14px;font-size:.78rem;line-height:1.55;
-color:var(--warn);margin-top:14px}
-.warnbox b{color:#fbbf24}
+.cash-box{margin-top:10px; padding:8px; background:rgba(56,189,248,.1); border-radius:6px; font-size:.75rem}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>One Trade Calculator</h1>
-  <div class="sub">Enter the odds of one game. Get the exact stake for each side and the guaranteed profit — whichever side wins.</div>
+  <h1>Liquidity Hedge Calculator</h1>
+  <div class="sub">You can over-bet Side B to pull cash out of the platform, but you will lose money if Side A wins.</div>
 
-  <!-- INPUTS -->
   <div class="card">
     <h2>The Game</h2>
 
     <div class="oddsRow">
-      <label>Side A odds
-        <input id="oA" type="number" step="0.01" min="1.01" value="2.48">
+      <label>Side A odds (Affiliate)
+        <input id="oA" type="number" step="0.01" min="1.01" value="2.01">
       </label>
       <div class="vs">VS</div>
       <label>Side B odds
-        <input id="oB" type="number" step="0.01" min="1.01" value="1.48">
+        <input id="oB" type="number" step="0.01" min="1.01" value="2.01">
       </label>
     </div>
 
@@ -114,153 +80,125 @@ color:var(--warn);margin-top:14px}
       <label>Money on Side A (₹)
         <input id="cap" type="number" min="0" step="500" value="10000">
       </label>
-      <label>Bonus on losing stake (%)
-        <input id="bonus" type="number" min="0" max="100" step="1" value="50">
+      <label>Affiliate Rev Share (%)
+        <input id="rate" type="number" min="0" max="100" step="1" value="50">
       </label>
     </div>
 
     <div class="grid2" style="margin-top:12px">
-      <label>Bonus cap (₹)
-        <input id="capAmt" type="number" min="0" step="100" value="5000">
-      </label>
-      <label>Extra rebate on loser (%)
-        <input id="rebate" type="number" min="0" step="0.5" value="0">
+      <label>Money on Side B (₹) — You can edit this
+        <input id="stakeB" type="number" min="0" step="500" value="7512">
+        <button class="btn" id="balanceBtn">Auto-Balance (Equal Profit)</button>
+        <button class="btn" id="liquidityBtn">Max Cash on B (Break-even if A wins)</button>
       </label>
     </div>
-
-    <div class="note">Side A is the side you're funding first. The app calculates what to put on Side B so both outcomes pay the same.</div>
   </div>
 
-  <!-- RESULT -->
   <div id="out"></div>
 
-  <div class="note" style="padding-bottom:32px">
-    Conceptual model only — real results depend on liquidity, settlement, fees and platform terms.
-  </div>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 const money = n => (n<0?'−₹':'₹') + Math.abs(Math.round(n)).toLocaleString('en-IN');
 
+function autoBalance() {
+  const oA = parseFloat($('oA').value);
+  const oB = parseFloat($('oB').value);
+  const L  = parseFloat($('cap').value) || 0;
+  const r  = (parseFloat($('rate').value) || 0) / 100;
+  if(oA>1 && oB>1 && L>0) {
+    $('stakeB').value = Math.round(L * (oA - r) / oB);
+    calc();
+  }
+}
+
+function maxCash() {
+  const oA = parseFloat($('oA').value);
+  const oB = parseFloat($('oB').value);
+  const L  = parseFloat($('cap').value) || 0;
+  // To break even if A wins: W = L * (oA - 1)
+  // This maximizes cash on B while ensuring you don't lose money if A wins.
+  if(oA>1 && oB>1 && L>0) {
+    $('stakeB').value = Math.round(L * (oA - 1));
+    calc();
+  }
+}
+
 function calc(){
   const oA = parseFloat($('oA').value);
   const oB = parseFloat($('oB').value);
   const L  = parseFloat($('cap').value) || 0;
-  const b  = (parseFloat($('bonus').value) || 0) / 100;
-  const cap = parseFloat($('capAmt').value) || 0;
-  const k  = (parseFloat($('rebate').value) || 0) / 100;
+  const r  = (parseFloat($('rate').value) || 0) / 100;
+  const W  = parseFloat($('stakeB').value) || 0;
   const out = $('out');
 
-  if(!(oA > 1.001 && oB > 1.001) || L <= 0){
-    out.innerHTML = `<div class="card"><div class="note">Enter both odds above 1.01 and money above 0.</div></div>`;
+  if(!(oA > 1.001 && oB > 1.001) || L <= 0 || W <= 0){
+    out.innerHTML = `<div class="card"><div class="note">Enter valid odds and money.</div></div>`;
     return;
   }
 
-  // Balanced stake on Side B so both outcomes pay equally
-  // Bonus is capped at capAmt on whichever side loses.
-  // With cap engaged on both sides, balance is: W = L × (oA − k) / (oB − k)
-  const den = oB - k;
-  if(Math.abs(den) < 1e-6){
-    out.innerHTML = `<div class="card"><div class="note">Odds too close to rebate — cannot balance.</div></div>`;
-    return;
-  }
-  const W = L * (oA - k) / den;
+  // Scenario 1: A loses (You get Rev Share)
+  const pA_loses = W * (oB - 1) - L + (L * r);
+  // Cash returned to Side B account if A loses
+  const cashB_ifALoses = W * oB; 
 
-  // Actual bonuses per scenario (capped)
-  const bonusIfALoses = Math.min(b * L, cap);   // bonus comes from A's losing stake
-  const bonusIfBLoses = Math.min(b * W, cap);   // bonus comes from B's losing stake
+  // Scenario 2: A wins (No Deduction)
+  const pB_loses = L * (oA - 1) - W;
+  // Cash returned to Side A account if A wins
+  const cashA_ifB_loses = L * oA;
 
-  // Scenario 1: A loses → B wins (B pays out)
-  const pA_loses = W * (oB - 1) - L + bonusIfALoses + k * L;
-
-  // Scenario 2: B loses → A wins (A pays out)
-  const pB_loses = L * (oA - 1) - W + bonusIfBLoses + k * W;
-
-  const guaranteed = Math.min(pA_loses, pB_loses);
   const capital = L + W;
-  const roi = capital > 0 ? (guaranteed / capital) * 100 : 0;
-  const balanced = Math.abs(pA_loses - pB_loses) < 2;
-  const profitable = guaranteed > 0;
-
-  const verdictColor = profitable
-    ? (roi >= 10 ? 'good' : 'warn')
-    : 'bad';
-  const verdictText = profitable
-    ? (roi >= 10 ? '✓ Profitable — worth placing' : '! Profitable but thin')
-    : '✕ Loses money — skip';
+  const guaranteed = Math.min(pA_loses, pB_loses);
+  const isBalanced = Math.abs(pA_loses - pB_loses) < 5;
 
   out.innerHTML = `
-    <div class="result">
-      <h2>Place This</h2>
-
-      <div class="place">
-        <div class="slip a">
-          <div class="side">Side A</div>
-          <div class="amt">${money(L)}</div>
-          <div class="at">at odds ${oA.toFixed(2)}</div>
-        </div>
-        <div class="slip b">
-          <div class="side">Side B</div>
-          <div class="amt">${money(W)}</div>
-          <div class="at">at odds ${oB.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="profitBox ${profitable ? '' : 'neg'}">
-        <div class="lbl">Guaranteed Profit — whichever wins</div>
-        <div class="val">${money(guaranteed)}</div>
-        <div class="roi">${money(capital)} locked · ${roi.toFixed(2)}% ROI · ${verdictText}</div>
-      </div>
-    </div>
-
     <div class="card">
-      <h2>Both Outcomes</h2>
+      <h2>Cash Flow & Outcomes</h2>
       <div class="scen">
-        <div class="sc win">
+        
+        <div class="sc ${pA_loses >= 0 ? 'win' : 'lose'}">
           <div class="head">If Side A loses (B wins)</div>
-          <div class="line"><span>B pays out</span><b>${money(W*(oB-1))}</b></div>
+          <div class="line"><span>B pays out</span><b>+${money(W*(oB-1))}</b></div>
           <div class="line"><span>Lose A's stake</span><b>−${money(L)}</b></div>
-          <div class="line"><span>Bonus received</span><b>+${money(bonusIfALoses)}</b></div>
-          ${k>0?`<div class="line"><span>Rebate</span><b>+${money(k*L)}</b></div>`:''}
-          <div class="total"><span>Net</span><span>${money(pA_loses)}</span></div>
+          <div class="line"><span>Rev Share Received</span><b>+${money(L*r)}</b></div>
+          <div class="total"><span>Net Profit</span><span>${money(pA_loses)}</span></div>
+          
+          <div class="cash-box">
+            💰 <b>Liquid Cash:</b> You get <b>${money(cashB_ifALoses)}</b> in your Side B account.
+          </div>
         </div>
-        <div class="sc win">
+
+        <div class="sc ${pB_loses >= 0 ? 'win' : 'lose'}">
           <div class="head">If Side B loses (A wins)</div>
-          <div class="line"><span>A pays out</span><b>${money(L*(oA-1))}</b></div>
+          <div class="line"><span>A pays out</span><b>+${money(L*(oA-1))}</b></div>
           <div class="line"><span>Lose B's stake</span><b>−${money(W)}</b></div>
-          <div class="line"><span>Bonus received</span><b>+${money(bonusIfBLoses)}</b></div>
-          ${k>0?`<div class="line"><span>Rebate</span><b>+${money(k*W)}</b></div>`:''}
-          <div class="total"><span>Net</span><span>${money(pB_loses)}</span></div>
+          <div class="line"><span>No Deduction</span><b>₹0</b></div>
+          <div class="total"><span>Net Profit</span><span>${money(pB_loses)}</span></div>
+          
+          <div class="cash-box" style="background:rgba(239,68,68,.1);">
+            🔒 <b>Locked Cash:</b> You get <b>${money(cashA_ifB_loses)}</b> in Side A (requires withdrawal).
+          </div>
         </div>
+
       </div>
-
-      ${balanced
-        ? `<div class="note">✓ Both outcomes pay the same — this position is fully hedged. There is no bad result.</div>`
-        : `<div class="warnbox"><b>⚠ Not fully balanced.</b> The bonus cap is hitting one side harder than the other (one branch pays ${money(Math.max(pA_loses,pB_loses))}, the other ${money(Math.min(pA_loses,pB_loses))}). To equalize them, set Side A money to about <b>${money(cap / b || 0)}</b> or raise the bonus cap.</div>`}
-    </div>
-
-    <div class="card">
-      <h2>How it was calculated</h2>
-      <div style="font-family:ui-monospace,monospace;font-size:.74rem;line-height:2;color:var(--mut);background:var(--card2);padding:14px;border-radius:10px;white-space:pre-wrap">
-<b style="color:var(--txt)">Stake on Side B</b>
-W = Money on A × (oA − rebate) ÷ (oB − rebate)
-W = ${L} × (${oA.toFixed(2)} − ${k.toFixed(2)}) ÷ (${oB.toFixed(2)} − ${k.toFixed(2)})
-W = <b style="color:var(--txt)">${W.toFixed(2)}</b>
-
-<b style="color:var(--txt)">Why this number</b>
-It makes the payout from Side A's win exactly cancel
-the loss of Side B's stake (and vice versa), so the
-profit is identical in both outcomes.
-      </div>
+      
+      ${isBalanced 
+        ? `<div class="note" style="color:var(--good); font-weight:bold; text-align:center; margin-top:12px;">✓ Balanced: Profits are exactly equal.</div>`
+        : `<div class="note" style="color:var(--warn); font-weight:bold; text-align:center; margin-top:12px;">⚠ Unbalanced: You make ${money(Math.abs(pA_loses - pB_loses))} more if Side A ${pA_loses > pB_loses ? 'loses' : 'wins'}.</div>`
+      }
     </div>
   `;
 }
 
-['oA','oB','cap','bonus','capAmt','rebate'].forEach(id => {
+$('balanceBtn').addEventListener('click', autoBalance);
+$('liquidityBtn').addEventListener('click', maxCash);
+
+['oA','oB','cap','rate','stakeB'].forEach(id => {
   $(id).addEventListener('input', calc);
 });
-calc();
+
+autoBalance();
 </script>
 </body>
 </html>
